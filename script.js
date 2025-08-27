@@ -126,7 +126,7 @@ const questions = [
     },
     {
         question: "What is the maximum balance for which interest is available on a Sangeeth Nidhi Saving Deposit?",
-        options: ["₹5,000", "₹1,000", "₹1,00,000", "No maximum limit"],
+        options: ["₹5,000", "₹1,00,000", "₹1,00,000", "No maximum limit"],
         answer: "₹1,00,000"
     },
     {
@@ -161,15 +161,31 @@ const questions = [
     }
 ];
 
+let testQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = {};
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
 document.getElementById('detailsForm').addEventListener('submit', function(e) {
     e.preventDefault();
     document.getElementById('detailsForm').style.display = 'none';
     document.getElementById('testContainer').style.display = 'block';
+
+    // Shuffle and select 20 questions
+    shuffle(questions);
+    testQuestions = questions.slice(0, 20);
     
     // Dynamically load questions
     const testForm = document.getElementById('testForm');
-    questions.forEach((q, index) => {
+    testQuestions.forEach((q, index) => {
         const div = document.createElement('div');
+        div.classList.add('question-block');
         div.innerHTML = `
             <p>${index + 1}. ${q.question}</p>
             ${q.options.map(opt => `
@@ -179,19 +195,71 @@ document.getElementById('detailsForm').addEventListener('submit', function(e) {
                 </label>
             `).join('')}
         `;
-        testForm.insertBefore(div, testForm.querySelector('button'));
+        testForm.appendChild(div);
     });
+
+    displayQuestion(currentQuestionIndex);
 });
+
+function displayQuestion(index) {
+    const questionBlocks = document.querySelectorAll('.question-block');
+    questionBlocks.forEach(block => block.style.display = 'none');
+    
+    const currentBlock = questionBlocks[index];
+    currentBlock.style.display = 'block';
+
+    document.getElementById('questionCounter').textContent = `Question ${index + 1} of ${testQuestions.length}`;
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    prevBtn.style.display = (index > 0) ? 'inline-block' : 'none';
+    nextBtn.style.display = (index < testQuestions.length - 1) ? 'inline-block' : 'none';
+    submitBtn.style.display = (index === testQuestions.length - 1) ? 'inline-block' : 'none';
+}
+
+document.getElementById('nextBtn').addEventListener('click', function() {
+    // Save current answer before moving on
+    saveAnswer(currentQuestionIndex);
+    currentQuestionIndex++;
+    displayQuestion(currentQuestionIndex);
+});
+
+document.getElementById('prevBtn').addEventListener('click', function() {
+    saveAnswer(currentQuestionIndex);
+    currentQuestionIndex--;
+    displayQuestion(currentQuestionIndex);
+});
+
+function saveAnswer(index) {
+    const radios = document.getElementsByName(`question${index}`);
+    for (const radio of radios) {
+        if (radio.checked) {
+            userAnswers[`question${index}`] = radio.value;
+            break;
+        }
+    }
+}
 
 document.getElementById('testForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    saveAnswer(currentQuestionIndex); // Save the last question's answer
 
-    const formData = new FormData(e.target);
-    const answers = {};
-    for (let [key, value] of formData.entries()) {
-        answers[key] = value;
-    }
-    
+    let score = 0;
+    const correctAnswers = {};
+    const userResponses = {};
+
+    testQuestions.forEach((q, index) => {
+        const userAnswer = userAnswers[`question${index}`];
+        userResponses[`question${index}`] = userAnswer;
+        correctAnswers[`question${index}`] = q.answer;
+
+        if (userAnswer === q.answer) {
+            score += 2.5; // 2.5 marks per question
+        }
+    });
+
     const details = {
         name: document.getElementById('name').value,
         code: document.getElementById('code').value,
@@ -199,11 +267,20 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
         branch: document.getElementById('branch').value
     };
 
+    function getGrade(score) {
+        if (score >= 45) return 'Excellent';
+        if (score >= 40) return 'Good';
+        if (score >= 30) return 'Average';
+        return 'Poor';
+    }
+
+    const grade = getGrade(score);
+
     // Send data to Netlify Function
     const response = await fetch('/.netlify/functions/submit-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ details, answers, questions })
+        body: JSON.stringify({ details, score, userResponses, correctAnswers, grade })
     });
 
     const result = await response.json();
@@ -211,19 +288,20 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
     // Display results and download buttons
     document.getElementById('testContainer').style.display = 'none';
     document.getElementById('resultsContainer').style.display = 'block';
-    document.getElementById('scoreDisplay').textContent = `Your score is: ${result.score} out of ${questions.length}`;
+    document.getElementById('scoreDisplay').textContent = `Your score is: ${score} out of 50`;
+    document.getElementById('gradeDisplay').textContent = `Your grade is: ${grade}`;
 
-    if (result.score >= questions.length * 0.7) { // 70% pass mark
+    if (score >= 35) {
         document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
         document.getElementById('downloadCertificateBtn').style.display = 'block';
         
         document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
-             // Create and download certificate (simple version)
              const certificateContent = `
                  <h1>Certificate of Completion</h1>
                  <p>This certifies that <strong>${details.name}</strong></p>
                  <p>has successfully completed the training validation test.</p>
-                 <p>Score: ${result.score} / ${questions.length}</p>
+                 <p>Score: ${score} / 50</p>
+                 <p>Grade: ${grade}</p>
              `;
              const newWindow = window.open('', 'Certificate', 'width=800,height=600');
              newWindow.document.write(certificateContent);
@@ -238,8 +316,8 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
     document.getElementById('downloadResponseBtn').addEventListener('click', () => {
         const responseData = {
             details: details,
-            answers_submitted: result.userResponses,
-            correct_answers: result.correctAnswers
+            answers_submitted: userResponses,
+            correct_answers: correctAnswers
         };
         const blob = new Blob([JSON.stringify(responseData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);

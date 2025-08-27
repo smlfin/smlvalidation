@@ -18,14 +18,20 @@
         </form>
 
         <div id="testContainer" style="display:none;">
+            <span id="questionCounter"></span>
             <form id="testForm">
-                <button type="submit">Submit Answers</button>
-            </form>
+                </form>
+            <div class="navigation-buttons">
+                <button type="button" id="prevBtn" style="display:none;">Previous</button>
+                <button type="button" id="nextBtn">Next</button>
+                <button type="submit" id="submitBtn" style="display:none;">Submit Answers</button>
+            </div>
         </div>
 
         <div id="resultsContainer" style="display:none;">
             <h2>Test Results</h2>
             <p id="scoreDisplay"></p>
+            <p id="gradeDisplay"></p>
             <p id="certificateMessage"></p>
             <button id="downloadCertificateBtn" style="display:none;">Download Certificate</button>
             <button id="downloadResponseBtn" style="display:none;">Download Responses</button>
