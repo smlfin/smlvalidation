@@ -2,8 +2,15 @@ const { google } = require('googleapis');
 
 exports.handler = async (event) => {
     try {
-        const { details, score, grade } = JSON.parse(event.body);
+        const { details, answers, questions } = JSON.parse(event.body);
         const { name, code, designation, branch } = details;
+        let score = 0;
+        questions.forEach((q, index) => {
+            const userAnswer = answers[`question${index}`];
+            if (userAnswer === q.answer) {
+                score++;
+            }
+        });
 
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT),
@@ -14,7 +21,7 @@ exports.handler = async (event) => {
         const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
         const range = 'Sheet1!A2'; 
         const values = [
-            [new Date().toISOString(), name, code, designation, branch, score, grade]
+            [new Date().toISOString(), name, code, designation, branch, score]
         ];
         const resource = { values };
 
