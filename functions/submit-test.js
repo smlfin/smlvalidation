@@ -1,28 +1,31 @@
-
+const { google } = require('googleapis');
 
 exports.handler = async (event) => {
     try {
-        const { employeeName, employeeCode, designation, branch, score } = JSON.parse(event.body);
+        const { details, answers, questions } = JSON.parse(event.body);
+        const { name, code, designation, branch } = details;
+        let score = 0;
+        questions.forEach((q, index) => {
+            const userAnswer = answers[`question${index}`];
+            if (userAnswer === q.answer) {
+                score++;
+            }
+        });
 
-        // Authenticate with Google Sheets using the service account credentials
         const auth = new google.auth.GoogleAuth({
             credentials: JSON.parse(process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT),
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
         const sheets = google.sheets({ version: 'v4', auth });
 
-        // Get your spreadsheet ID from its URL
-        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04'; 
-        const range = 'Sheet1!A2'; // The range where your data will be appended
-
-        // Prepare the data to be written
+        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
+        const range = 'Sheet1!A2'; 
         const values = [
-            [new Date().toISOString(), employeeName, employeeCode, designation, branch, score]
+            [new Date().toISOString(), name, code, designation, branch, score]
         ];
         const resource = { values };
 
-        // Append the data to the spreadsheet
-        const response = await sheets.spreadsheets.values.append({
+        await sheets.spreadsheets.values.append({
             spreadsheetId,
             range,
             valueInputOption: 'RAW',

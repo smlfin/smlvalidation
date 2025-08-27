@@ -23,7 +23,7 @@ exports.handler = async (event) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
         // Get your spreadsheet ID from its URL
-        const spreadsheetId = 'd/1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04'; 
+        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04'; 
         const range = 'Sheet1!A2'; 
 
         // Prepare the data to be written
