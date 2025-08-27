@@ -219,7 +219,6 @@ document.getElementById('nextBtn').addEventListener('click', async function() {
     saveAnswer(currentQuestionIndex);
 
     if (currentQuestionIndex === testQuestions.length - 1) {
-        // This is the final question, so we submit
         submitTest();
     } else {
         currentQuestionIndex++;
@@ -293,13 +292,87 @@ async function submitTest() {
         
         document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
              const certificateContent = `
-                 <h1>Certificate of Completion</h1>
-                 <p>This certifies that <strong>${details.name}</strong></p>
-                 <p>has successfully completed the training validation test.</p>
-                 <p>Score: ${score} / 50</p>
-                 <p>Grade: ${grade}</p>
+                 <style>
+                     body { font-family: 'Times New Roman', serif; background: #f0f2f5; margin: 0; padding: 20px; }
+                     .certificate {
+                         width: 800px;
+                         height: 600px;
+                         border: 20px solid #004d80;
+                         padding: 20px;
+                         text-align: center;
+                         background: #fff;
+                         box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                         margin: auto;
+                         position: relative;
+                     }
+                     .certificate-logo {
+                         position: absolute;
+                         top: 20px;
+                         left: 20px;
+                         width: 100px;
+                     }
+                     .certificate h1 {
+                         font-size: 48px;
+                         color: #004d80;
+                         margin-top: 50px;
+                         text-transform: uppercase;
+                         letter-spacing: 2px;
+                     }
+                     .certificate h2 {
+                         font-size: 24px;
+                         color: #343a40;
+                         margin-top: 20px;
+                     }
+                     .certificate p {
+                         font-size: 18px;
+                         line-height: 1.8;
+                         margin-top: 30px;
+                     }
+                     .certificate .name {
+                         font-size: 32px;
+                         font-weight: bold;
+                         color: #007bff;
+                         margin: 20px 0;
+                     }
+                     .signatures {
+                         display: flex;
+                         justify-content: space-around;
+                         margin-top: 100px;
+                     }
+                     .signatures div {
+                         text-align: center;
+                     }
+                     .signatures img {
+                         height: 50px;
+                         margin-bottom: 5px;
+                     }
+                     .signatures p {
+                         font-size: 16px;
+                         margin: 0;
+                         border-top: 1px solid #343a40;
+                         width: 150px;
+                         padding-top: 5px;
+                     }
+                 </style>
+                 <div class="certificate">
+                     <img src="v.png" alt="Logo" class="certificate-logo">
+                     <h1>Certificate of Completion</h1>
+                     <p>This certifies that</p>
+                     <p class="name">${details.name}</p>
+                     <p>has successfully completed the training validation test.</p>
+                     <p><strong>Employee Code:</strong> ${details.code} &bull; <strong>Designation:</strong> ${details.designation} &bull; <strong>Branch:</strong> ${details.branch}</p>
+                     <p><strong>Score:</strong> ${score} / 50 &bull; <strong>Grade:</strong> ${grade}</p>
+                     <div class="signatures">
+                         <div>
+                             <p>HR Head</p>
+                         </div>
+                         <div>
+                             <p>Training Head</p>
+                         </div>
+                     </div>
+                 </div>
              `;
-             const newWindow = window.open('', 'Certificate', 'width=800,height=600');
+             const newWindow = window.open('', 'Certificate', 'width=900,height=700');
              newWindow.document.write(certificateContent);
              newWindow.document.close();
              newWindow.print();
@@ -326,7 +399,6 @@ async function submitTest() {
     });
 }
 
-// Remove the old submit event listener from the form
 document.getElementById('testForm').addEventListener('submit', function(e) {
     e.preventDefault();
 });
