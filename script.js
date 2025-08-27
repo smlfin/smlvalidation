@@ -164,6 +164,7 @@ const questions = [
 let testQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = {};
+let isSubmitting = false;
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -216,9 +217,19 @@ function displayQuestion(index) {
 }
 
 document.getElementById('nextBtn').addEventListener('click', async function() {
+    if (isSubmitting) {
+        return; // Prevent multiple clicks
+    }
+
     saveAnswer(currentQuestionIndex);
 
     if (currentQuestionIndex === testQuestions.length - 1) {
+        // This is the final question, so we submit
+        const nextBtn = document.getElementById('nextBtn');
+        nextBtn.disabled = true;
+        nextBtn.textContent = 'Submitting...';
+        isSubmitting = true;
+
         submitTest();
     } else {
         currentQuestionIndex++;
@@ -288,7 +299,6 @@ async function submitTest() {
         console.log('Backend response:', result);
     } catch (error) {
         console.error('Error submitting test:', error);
-        // You might want to display a user-friendly error message here
     }
     
     document.getElementById('testContainer').style.display = 'none';
@@ -408,7 +418,3 @@ async function submitTest() {
         document.body.removeChild(a);
     });
 }
-
-document.getElementById('testForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-});
