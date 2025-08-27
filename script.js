@@ -273,13 +273,23 @@ async function submitTest() {
 
     const grade = getGrade(score);
 
-    const response = await fetch('/.netlify/functions/submit-test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ details, score, userResponses, correctAnswers, grade })
-    });
+    try {
+        const response = await fetch('/.netlify/functions/submit-test', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ details, score, userResponses, correctAnswers, grade })
+        });
 
-    const result = await response.json();
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Backend response:', result);
+    } catch (error) {
+        console.error('Error submitting test:', error);
+        // You might want to display a user-friendly error message here
+    }
     
     document.getElementById('testContainer').style.display = 'none';
     document.getElementById('resultsContainer').style.display = 'block';
@@ -349,9 +359,9 @@ async function submitTest() {
                      .signatures p {
                          font-size: 16px;
                          margin: 0;
-                         border-top: 1px solid #343a40;
+                         border-bottom: 1px solid #343a40;
                          width: 150px;
-                         padding-top: 5px;
+                         padding-bottom: 5px;
                      }
                  </style>
                  <div class="certificate">
