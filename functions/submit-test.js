@@ -1,61 +1,43 @@
-const admin = require('firebase-admin');
+const { google } = require('googleapis');
 
-// Initialize Firebase Admin SDK (fetch from environment variables)
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+exports.handler = async (event) => {
+    try {
+        const { employeeName, employeeCode, designation, branch, score } = JSON.parse(event.body);
 
-const db = admin.firestore();
+        // Authenticate with Google Sheets using the service account credentials
+        const auth = new google.auth.GoogleAuth({
+            credentials: JSON.parse(process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT),
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+        const sheets = google.sheets({ version: 'v4', auth });
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
+        // Get your spreadsheet ID from its URL
+        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04'; 
+        const range = 'Sheet1!A2'; // The range where your data will be appended
 
-  const { details, answers, questions } = JSON.parse(event.body);
+        // Prepare the data to be written
+        const values = [
+            [new Date().toISOString(), employeeName, employeeCode, designation, branch, score]
+        ];
+        const resource = { values };
 
-  let score = 0;
-  const userResponses = {};
-  const correctAnswers = {};
+        // Append the data to the spreadsheet
+        const response = await sheets.spreadsheets.values.append({
+            spreadsheetId,
+            range,
+            valueInputOption: 'RAW',
+            resource,
+        });
 
-  questions.forEach((q, index) => {
-    const questionKey = `question${index}`;
-    userResponses[q.question] = answers[questionKey];
-    correctAnswers[q.question] = q.answer;
-
-    if (answers[questionKey] === q.answer) {
-      score++;
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Data saved to Google Sheet!' })
+        };
+    } catch (error) {
+        console.error('Error writing to Google Sheet:', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Failed to write data.' })
+        };
     }
-  });
-
-  const timestamp = admin.firestore.FieldValue.serverTimestamp();
-  
-  try {
-    // Store data in Firestore
-    await db.collection('test_submissions').add({
-      ...details,
-      score,
-      totalQuestions: questions.length,
-      userResponses,
-      correctAnswers,
-      submittedAt: timestamp
-    });
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: 'Test submitted successfully!',
-        score,
-        userResponses,
-        correctAnswers
-      })
-    };
-  } catch (error) {
-    console.error('Error writing to Firestore:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Error submitting test.' })
-    };
-  }
 };
