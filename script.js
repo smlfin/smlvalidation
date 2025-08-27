@@ -177,11 +177,9 @@ document.getElementById('detailsForm').addEventListener('submit', function(e) {
     document.getElementById('detailsForm').style.display = 'none';
     document.getElementById('testContainer').style.display = 'block';
 
-    // Shuffle and select 20 questions
     shuffle(questions);
     testQuestions = questions.slice(0, 20);
     
-    // Dynamically load questions
     const testForm = document.getElementById('testForm');
     testQuestions.forEach((q, index) => {
         const div = document.createElement('div');
@@ -212,18 +210,21 @@ function displayQuestion(index) {
     
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const submitBtn = document.getElementById('submitBtn');
     
     prevBtn.style.display = (index > 0) ? 'inline-block' : 'none';
-    nextBtn.style.display = (index < testQuestions.length - 1) ? 'inline-block' : 'none';
-    submitBtn.style.display = (index === testQuestions.length - 1) ? 'inline-block' : 'none';
+    nextBtn.textContent = (index === testQuestions.length - 1) ? 'Submit Answers' : 'Next';
 }
 
-document.getElementById('nextBtn').addEventListener('click', function() {
-    // Save current answer before moving on
+document.getElementById('nextBtn').addEventListener('click', async function() {
     saveAnswer(currentQuestionIndex);
-    currentQuestionIndex++;
-    displayQuestion(currentQuestionIndex);
+
+    if (currentQuestionIndex === testQuestions.length - 1) {
+        // This is the final question, so we submit
+        submitTest();
+    } else {
+        currentQuestionIndex++;
+        displayQuestion(currentQuestionIndex);
+    }
 });
 
 document.getElementById('prevBtn').addEventListener('click', function() {
@@ -242,10 +243,7 @@ function saveAnswer(index) {
     }
 }
 
-document.getElementById('testForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    saveAnswer(currentQuestionIndex); // Save the last question's answer
-
+async function submitTest() {
     let score = 0;
     const correctAnswers = {};
     const userResponses = {};
@@ -256,7 +254,7 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
         correctAnswers[`question${index}`] = q.answer;
 
         if (userAnswer === q.answer) {
-            score += 2.5; // 2.5 marks per question
+            score += 2.5;
         }
     });
 
@@ -276,7 +274,6 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
 
     const grade = getGrade(score);
 
-    // Send data to Netlify Function
     const response = await fetch('/.netlify/functions/submit-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -285,7 +282,6 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
 
     const result = await response.json();
     
-    // Display results and download buttons
     document.getElementById('testContainer').style.display = 'none';
     document.getElementById('resultsContainer').style.display = 'block';
     document.getElementById('scoreDisplay').textContent = `Your score is: ${score} out of 50`;
@@ -328,4 +324,9 @@ document.getElementById('testForm').addEventListener('submit', async function(e)
         a.click();
         document.body.removeChild(a);
     });
+}
+
+// Remove the old submit event listener from the form
+document.getElementById('testForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 });
