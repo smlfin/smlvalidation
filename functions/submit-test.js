@@ -19,7 +19,7 @@ exports.handler = async (event) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
         const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
-        const range = 'Sheet1!A:B'; // Updated range to check Employee Code
+        const range = 'Sheet1!A:C'; // Updated range to check Employee Code
 
         // Read the first two columns to check for existing codes
         const response = await sheets.spreadsheets.values.get({
