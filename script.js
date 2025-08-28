@@ -111,8 +111,8 @@ const questions = [
     },
     {
         question: "If a customer says, 'I don’t have a Demat account,' which of the following is a valid option for them to invest in?",
-        options: ["SML NCD", "Vanchinad NCD", "Only SML NCD with a free Demat account opening.", "Golden Bonds"],
-        answer: "Golden Bonds"
+        options: ["There are no other options", "Free Demat account opening support avilable / Vanchinad NCD /Subdebt/Sangeeth FD."],
+        answer: "Vanchinad NCD", "Free Demat account opening support avilable / Vanchinad NCD /Subdebt/Sangeeth FD."
     },
     {
         question: "What is the yearly interest rate for Sangeeth Nidhi Recurring Deposit (RD)?",
@@ -126,7 +126,7 @@ const questions = [
     },
     {
         question: "What is the maximum balance for which interest is available on a Sangeeth Nidhi Saving Deposit?",
-        options: ["₹5,000", "₹1,00,000", "₹1,00,000", "No maximum limit"],
+        options: ["₹5,000", "₹10,000", "₹1,00,000", "No maximum limit"],
         answer: "₹1,00,000"
     },
     {
@@ -409,6 +409,7 @@ async function submitTest() {
                      <p>has successfully completed the training validation test.</p>
                      <p><strong>Employee Code:</strong> ${details.code} &bull; <strong>Designation:</strong> ${details.designation} &bull; <strong>Branch:</strong> ${details.branch}</p>
                      <p><strong>Score:</strong> ${score} / 50 &bull; <strong>Grade:</strong> ${grade}</p>
+                     <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</p>
                      <div class="signatures">
                          <div>
                              <p>HR Head</p>
