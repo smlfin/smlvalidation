@@ -172,33 +172,51 @@ function shuffle(array) {
     }
 }
 
-document.getElementById('detailsForm').addEventListener('submit', function(e) {
+document.getElementById('detailsForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    document.getElementById('detailsForm').style.display = 'none';
-    document.getElementById('testContainer').style.display = 'block';
 
-    shuffle(questions);
-    testQuestions = questions.slice(0, 20);
-    
-    const testForm = document.getElementById('testForm');
-    testQuestions.forEach((q, index) => {
-        const div = document.createElement('div');
-        div.classList.add('question-block');
-        div.innerHTML = `
-            <p>${index + 1}. ${q.question}</p>
-            ${q.options.map(opt => `
-                <label>
-                    <input type="radio" name="question${index}" value="${opt}" required>
-                    ${opt}
-                </label>
-            `).join('')}
-        `;
-        testForm.appendChild(div);
-    });
+    const employeeCode = document.getElementById('code').value;
 
-    displayQuestion(currentQuestionIndex);
+    try {
+        const checkResponse = await fetch('/.netlify/functions/check-submission', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: employeeCode })
+        });
+
+        if (checkResponse.status === 409) {
+            alert('This Employee Code has already submitted the test.');
+            return;
+        }
+
+        document.getElementById('detailsForm').style.display = 'none';
+        document.getElementById('testContainer').style.display = 'block';
+
+        shuffle(questions);
+        testQuestions = questions.slice(0, 20);
+
+        const testForm = document.getElementById('testForm');
+        testQuestions.forEach((q, index) => {
+            const div = document.createElement('div');
+            div.classList.add('question-block');
+            div.innerHTML = `
+                <p>${index + 1}. ${q.question}</p>
+                ${q.options.map(opt => `
+                    <label>
+                        <input type="radio" name="question${index}" value="${opt}" required>
+                        ${opt}
+                    </label>
+                `).join('')}
+            `;
+            testForm.appendChild(div);
+        });
+
+        displayQuestion(currentQuestionIndex);
+    } catch (error) {
+        console.error('Error checking for existing submission:', error);
+        alert('An error occurred. Please try again.');
+    }
 });
-
 function displayQuestion(index) {
     const questionBlocks = document.querySelectorAll('.question-block');
     questionBlocks.forEach(block => block.style.display = 'none');
@@ -305,7 +323,7 @@ async function submitTest() {
     document.getElementById('scoreDisplay').textContent = `Your score is: ${score} out of 50`;
     document.getElementById('gradeDisplay').textContent = `Your grade is: ${grade}`;
 
-    if (score >= 35) {
+    if (score >= 0) {
         document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
         document.getElementById('downloadCertificateBtn').style.display = 'block';
         

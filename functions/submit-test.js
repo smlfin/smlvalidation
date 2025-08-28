@@ -19,15 +19,33 @@ exports.handler = async (event) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
         const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
-        const range = 'Sheet1!A2'; 
+        const range = 'Sheet1!A:B'; // Updated range to check Employee Code
+
+        // Read the first two columns to check for existing codes
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range,
+        });
+
+        const existingValues = response.data.values || [];
+        const isAlreadySubmitted = existingValues.some(row => row[1] === code);
+
+        if (isAlreadySubmitted) {
+            return {
+                statusCode: 409, // Conflict
+                body: JSON.stringify({ error: 'This Employee Code has already submitted the test.' })
+            };
+        }
+
         const values = [
             [new Date().toISOString(), name, code, designation, branch, score, grade]
         ];
         const resource = { values };
-
+        
+        // Append the new data
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range,
+            range: 'Sheet1!A2',
             valueInputOption: 'RAW',
             resource,
         });
