@@ -150,10 +150,10 @@ const questions = [
         answer: "12%"
     },
     {
-        question: "What is the correct statement about a Demat account and investing in SML Finance NCD?",
-        options: ["A Demat account is not required for SML Finance NCD.", "The company can help a customer open a Demat account for free to invest in SML Finance NCD.", "A Demat account is only required for amounts above 15 Lakhs.", "Only Vanchinad NCD requires a Demat account."],
-        answer: "The company can help a customer open a Demat account for free to invest in SML Finance NCD."
-    },
+    question: "What is the correct statement about a Demat account and investing in SML Finance NCD?",
+    options: ["A Demat account is not required for SML Finance NCD.", "The company can help a customer open a Demat account for free to invest in SML Finance NCD.", "A Demat account is only required for amounts above 15 Lakhs.", "Only Vanchinad NCD requires a Demat account."],
+    answer: "The company can help a customer open a Demat account for free to invest in SML Finance NCD."
+},
     {
         question: "What is a key difference between NCDs and FDs according to the training material?",
         options: ["NCDs are accepted by Nidhi Companies, while FDs are accepted by NBFCs.", "NCDs are debt instruments that can be converted into equity, while FDs cannot.", "NCDs are issued by NBFCs and FDs are accepted by Nidhi Companies.", "NCDs are regulated by the MCA, and FDs are regulated by the RBI."],
