@@ -324,7 +324,7 @@ async function submitTest() {
     document.getElementById('gradeDisplay').textContent = `Your grade is: ${grade}`;
 
     if (score >= 0) {
-        document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
+       // document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
         document.getElementById('downloadCertificateBtn').style.display = 'block';
         
         document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
