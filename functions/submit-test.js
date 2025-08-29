@@ -45,7 +45,7 @@ exports.handler = async (event) => {
         
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range: 'Sheet1!A2',
+            range: 'Sheet1!C2',
             valueInputOption: 'RAW',
             resource,
         });
