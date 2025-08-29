@@ -110,9 +110,9 @@ const questions = [
         answer: "No cut"
     },
     {
-        question: "If a customer says, 'I don’t have a Demat account,' which of the following is a valid option for them to invest in?",
-        options: ["SML NCD", "Vanchinad NCD", "Only SML NCD with a free Demat account opening.", "Golden Bonds"],
-        answer: "Golden Bonds"
+        question: "If a customer says, 'I don’t have a Demat account,' which of the following is a valid statement?",
+        options: ["Demat Support is provided by us", "Cutomer can invest through NSDL account", "Customer has to open CDSL account by their own"],
+        answer: "Demat Support is provided by us"
     },
     {
         question: "What is the yearly interest rate for Sangeeth Nidhi Recurring Deposit (RD)?",
@@ -305,8 +305,8 @@ async function submitTest() {
     document.getElementById('scoreDisplay').textContent = `Your score is: ${score} out of 50`;
     document.getElementById('gradeDisplay').textContent = `Your grade is: ${grade}`;
 
-    if (score >= 35) {
-        document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
+    if (score >= 0) {
+       // document.getElementById('certificateMessage').textContent = 'Congratulations! You passed the test.';
         document.getElementById('downloadCertificateBtn').style.display = 'block';
         
         document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
