@@ -19,7 +19,7 @@ exports.handler = async (event) => {
         const sheets = google.sheets({ version: 'v4', auth });
 
         const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
-        const range = 'Sheet1!C:C2'; // Look only at the column with the employee code.
+        const range = 'Sheet1!C:C'; // Look only at the column with the employee code.
 
         // Get all employee codes from the sheet
         const response = await sheets.spreadsheets.values.get({

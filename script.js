@@ -172,31 +172,64 @@ function shuffle(array) {
     }
 }
 
-document.getElementById('detailsForm').addEventListener('submit', function(e) {
+document.getElementById('detailsForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    document.getElementById('detailsForm').style.display = 'none';
-    document.getElementById('testContainer').style.display = 'block';
+    const employeeCode = document.getElementById('code').value;
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Checking...';
 
-    shuffle(questions);
-    testQuestions = questions.slice(0, 20);
-    
-    const testForm = document.getElementById('testForm');
-    testQuestions.forEach((q, index) => {
-        const div = document.createElement('div');
-        div.classList.add('question-block');
-        div.innerHTML = `
-            <p>${index + 1}. ${q.question}</p>
-            ${q.options.map(opt => `
-                <label>
-                    <input type="radio" name="question${index}" value="${opt}" required>
-                    ${opt}
-                </label>
-            `).join('')}
-        `;
-        testForm.appendChild(div);
-    });
+    try {
+        const response = await fetch('/.netlify/functions/check-submission', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: employeeCode })
+        });
 
-    displayQuestion(currentQuestionIndex);
+        if (response.status === 409) {
+            alert('This employee code has already submitted the test. You are not allowed to take it again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Start Test';
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // If the code is new, proceed with the test
+        document.getElementById('detailsForm').style.display = 'none';
+        document.getElementById('testContainer').style.display = 'block';
+
+        shuffle(questions);
+        testQuestions = questions.slice(0, 20);
+        
+        const testForm = document.getElementById('testForm');
+        testQuestions.forEach((q, index) => {
+            const div = document.createElement('div');
+            div.classList.add('question-block');
+            div.innerHTML = `
+                <p>${index + 1}. ${q.question}</p>
+                ${q.options.map(opt => `
+                    <label>
+                        <input type="radio" name="question${index}" value="${opt}" required>
+                        ${opt}
+                    </label>
+                `).join('')}
+            `;
+            testForm.appendChild(div);
+        });
+
+        displayQuestion(currentQuestionIndex);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Start Test';
+        
+    } catch (error) {
+        console.error('Error checking submission:', error);
+        alert('An error occurred. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Start Test';
+    }
 });
 
 function displayQuestion(index) {
