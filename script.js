@@ -173,31 +173,30 @@ function shuffle(array) {
 }
 
 document.getElementById('detailsForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const employeeCode = document.getElementById('code').value;
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Checking...';
+    e.preventDefault(); // Prevent the default form submission and page refresh
+
+    const code = document.getElementById('code').value;
 
     try {
+        // Call the backend to check if the employee code already exists
         const response = await fetch('/.netlify/functions/check-submission', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: employeeCode })
+            body: JSON.stringify({ code })
         });
 
         if (response.status === 409) {
-            alert('This employee code has already submitted the test. You are not allowed to take it again.');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Start Test';
+            // The code exists; prevent the test from starting and show an alert
+            alert("This Employee Code has already submitted the test. You cannot take the test again.");
             return;
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Handle other potential errors from the backend
+            throw new Error(`Server error: ${response.status}`);
         }
-        
-        // If the code is new, proceed with the test
+
+        // If the code is new (response.ok), proceed to start the test
         document.getElementById('detailsForm').style.display = 'none';
         document.getElementById('testContainer').style.display = 'block';
 
@@ -221,14 +220,10 @@ document.getElementById('detailsForm').addEventListener('submit', async function
         });
 
         displayQuestion(currentQuestionIndex);
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Start Test';
-        
+
     } catch (error) {
-        console.error('Error checking submission:', error);
+        console.error('Error during pre-submission check:', error);
         alert('An error occurred. Please try again.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Start Test';
     }
 });
 
