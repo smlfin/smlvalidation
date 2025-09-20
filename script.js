@@ -1,7 +1,7 @@
 const questions = [
     {
         question: "Which of the following companies is a Nidhi Company?",
-        options: ["SML Finance", "Vanchinad Finance", "Sangeeth Nidhi", "All of the above"],
+        options: ["SML Nidhi Finance ", "Vanchinad Finance Nidhi ", "Sangeeth Nidhi", "All of the above"],
         answer: "Sangeeth Nidhi"
     },
     {
@@ -147,7 +147,7 @@ const questions = [
     {
         question: "What are the interest payment modes in SML Finance NCD?",
         options: ["Monthly", "Annual", "Quarterly", "All of the above"],
-        answer: "Monthly"
+        answer: "Monthly
     },
     {
         question: "What is the correct statement about a Demat account and investing in SML Finance NCD?",
