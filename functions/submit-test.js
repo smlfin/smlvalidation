@@ -18,8 +18,8 @@ exports.handler = async (event) => {
         });
         const sheets = google.sheets({ version: 'v4', auth });
 
-        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
-        const range = 'sml!C:C'; // Look only at the column with the employee code.
+        const spreadsheetId = '1psYCY9eemevOzoZ9fSJtq3ktWNtL_I1Yc_a9hIzranQ';
+        const range = 'Sheet1!C:C'; // Look only at the column with the employee code.
 
         // Get all employee codes from the sheet
         const response = await sheets.spreadsheets.values.get({
@@ -45,7 +45,7 @@ exports.handler = async (event) => {
         
         await sheets.spreadsheets.values.append({
             spreadsheetId,
-            range: 'sml!A2',
+            range: 'Sheet1!A2',
             valueInputOption: 'RAW',
             resource,
         });

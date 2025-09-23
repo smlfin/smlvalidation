@@ -17,8 +17,8 @@ exports.handler = async (event) => {
         });
         const sheets = google.sheets({ version: 'v4', auth });
 
-        const spreadsheetId = '1dVJsvyms3XHVHJ47c2b0RuSIIG9PseXEiRU5fJ8md04';
-        const range = 'sml!C:C'; // Check only the column with the Employee Code
+        const spreadsheetId = '1psYCY9eemevOzoZ9fSJtq3ktWNtL_I1Yc_a9hIzranQ';
+        const range = 'Sheet1!C:C'; // Check only the column with the Employee Code
 
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,

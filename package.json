@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.2.2",
     "firebase-admin": "^13.4.0",
-    "googleapis": "^158.0.0"
+    "googleapis": "^158.0.0",
+    "netlify-plugin-inline-functions-env": "^1.0.9"
   }
 }
