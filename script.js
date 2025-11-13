@@ -16,8 +16,8 @@ const questions = [
     },
     {
         question: "What does a 'put option' in an NCD mean?",
-        options: ["The company has the option to buy back the NCD from the investor before the maturity date.", "The investor has the right to Redeem/Close the NCD to the company before the maturity date.", "The company has the right to sell the NCD to another investor.", "The investor must hold the NCD until the maturity date."],
-        answer: "The investor has the right to Redeem/Close the NCD to the company before the maturity date."
+        options: ["The company has the option to buy back the NCD from the investor before the maturity date.", "The investor has the right to Redeem/Close the NCD before the maturity date.", "The company has the right to sell the NCD to another investor.", "The investor must hold the NCD until the maturity date."],
+        answer: "The investor has the right to Redeem/Close the NCD before the maturity date."
     },
     {
         question: "What does it mean for an NCD to be 'secured'?",
@@ -132,7 +132,7 @@ const questions = [
     {
         question: "For Sangeeth Nidhi Recurring Deposits, what is the incentive for an employee?",
         options: ["5% of first EMI & 2 % of first EMI from 2nd year onwards", "5% of first EMI & 10 % of first EMI from 2nd year onwards", "10% of first EMI & 5 % of first EMI from 2nd year onwards", "2% PA."],
-        answer: "10% of first EMI & 5 % of first EMI from 2nd year onwards."
+        answer: "10% of first EMI & 5 % of first EMI from 2nd year onwards"
     },
     {
         question: "A customer with an annual interest income of above ₹3,50,000 is a Senior Citizen. Which form should they submit to avoid TDS, and is it accepted?",
@@ -141,8 +141,8 @@ const questions = [
     },
     {
         question: "What is the meaning of redemable ncd?",
-        options: ["Redeemable NCDs are those that the issuing company repays to investors at the end of the maturity period along with the agreed interest", "Redeemable NCDs can be freely sold back to the company at any time before maturity", "Redeemable NCDs mean the investor can withdraw the principal amount in parts whenever needed"],
-        answer: "Redeemable NCDs are those that the issuing company repays to investors at the end of the maturity period along with the agreed interest"
+        options: ["Redeemable NCDs are those that the issuing company repays to investors at the end of the maturity period along with the agreed interest or customers can opt to close after a specific time", "Redeemable NCDs can be freely sold back to the company at any time before maturity", "Redeemable NCDs mean the investor can withdraw the principal amount in parts whenever needed"],
+        answer: "Redeemable NCDs are those that the issuing company repays to investors at the end of the maturity period along with the agreed interest or customers can opt to close after a specific time"
     },
     {
         question: "What are the interest payment modes in SML Finance NCD?",
