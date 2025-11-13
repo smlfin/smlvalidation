@@ -92,7 +92,7 @@ const questions = [
     {
         question: "For a Sangeeth Nidhi Fixed Deposit with a period of 2 years, what is the yearly interest rate?",
         options: ["9%", "12%", "12.5%", "13%"],
-        answer: "12.5%"
+        answer: "12%"
     },
     {
         question: "Which of the following is a key reason why an investor's money is considered safe with SML and Vanchinad Finance?",
@@ -115,9 +115,9 @@ const questions = [
         answer: "Demat Support is provided by us"
     },
     {
-        question: "What is the yearly interest rate for Sangeeth Nidhi Recurring Deposit (RD)?",
-        options: ["5%", "9%", "12%", "12.5%"],
-        answer: "12%"
+        question: "What is the yearly interest rate for Sangeeth Nidhi Recurring Deposit (RD), for a period of 2 years?",
+        options: ["5%", "9%", "10%", "12.5%"],
+        answer: "10%"
     },
     {
         question: "Which of the following is NOT required for a Sangeeth Nidhi FD/RD?",
@@ -131,8 +131,8 @@ const questions = [
     },
     {
         question: "For Sangeeth Nidhi Recurring Deposits, what is the incentive for an employee?",
-        options: ["5% of first EMI.", ".50% of first EMI.", "1% of the deposit.", "2% PA."],
-        answer: "5% of first EMI."
+        options: ["5% of first EMI & 2 % of first EMI from 2nd year onwards", "5% of first EMI & 10 % of first EMI from 2nd year onwards", "10% of first EMI & 5 % of first EMI from 2nd year onwards", "2% PA."],
+        answer: "10% of first EMI & 5 % of first EMI from 2nd year onwards."
     },
     {
         question: "A customer with an annual interest income of above ₹3,50,000 is a Senior Citizen. Which form should they submit to avoid TDS, and is it accepted?",
@@ -172,40 +172,13 @@ function shuffle(array) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const intermediatePage = document.getElementById('intermediatePage');
-    const learningModuleContainer = document.getElementById('learningModuleContainer');
-    const detailsForm = document.getElementById('detailsForm');
-    const testModuleBtn = document.getElementById('testModuleBtn');
-    const learningModuleBtn = document.getElementById('learningModuleBtn');
-    const backToHomeBtn = document.getElementById('backToHomeBtn');
-    const h1 = document.querySelector('h1');
-
-    testModuleBtn.addEventListener('click', () => {
-        intermediatePage.style.display = 'none';
-        detailsForm.style.display = 'block';
-        h1.textContent = 'Test on Investment Products';
-    });
-
-    learningModuleBtn.addEventListener('click', () => {
-        intermediatePage.style.display = 'none';
-        learningModuleContainer.style.display = 'block';
-        h1.textContent = 'Learning Module';
-    });
-
-    backToHomeBtn.addEventListener('click', () => {
-        learningModuleContainer.style.display = 'none';
-        intermediatePage.style.display = 'block';
-        h1.textContent = 'SML Finance Class Room';
-    });
-});
-
 document.getElementById('detailsForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+    e.preventDefault(); // Prevent the default form submission and page refresh
 
     const code = document.getElementById('code').value;
 
     try {
+        // Call the backend to check if the employee code already exists
         const response = await fetch('/.netlify/functions/check-submission', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -213,14 +186,17 @@ document.getElementById('detailsForm').addEventListener('submit', async function
         });
 
         if (response.status === 409) {
+            // The code exists; prevent the test from starting and show an alert
             alert("This Employee Code has already submitted the test. You cannot take the test again.");
             return;
         }
 
         if (!response.ok) {
+            // Handle other potential errors from the backend
             throw new Error(`Server error: ${response.status}`);
         }
 
+        // If the code is new (response.ok), proceed to start the test
         document.getElementById('detailsForm').style.display = 'none';
         document.getElementById('testContainer').style.display = 'block';
 
@@ -272,6 +248,7 @@ document.getElementById('nextBtn').addEventListener('click', async function() {
         return;
     }
 
+    // Check if an answer is selected for the current question
     const radios = document.getElementsByName(`question${currentQuestionIndex}`);
     const isAnswered = Array.from(radios).some(radio => radio.checked);
 
@@ -368,12 +345,14 @@ async function submitTest() {
     document.getElementById('downloadCertificateBtn').style.display = 'block';
 
     document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
+        // Get the current date and format it
         const examDate = new Date().toLocaleDateString('en-IN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
 
+        // Use backticks (`) for the multi-line string
         const certificateContent = `
     <style>
         body { font-family: 'Times New Roman', serif; background: #f0f2f5; margin: 0; padding: 20px; }
