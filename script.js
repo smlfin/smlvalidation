@@ -160,6 +160,7 @@ const questions = [
         answer: "NCDs are issued by NBFCs and FDs are accepted by Nidhi Companies."
     }
 ];
+
 let testQuestions = [];
 let currentQuestionIndex = 0;
 let userAnswers = {};
@@ -172,13 +173,40 @@ function shuffle(array) {
     }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const intermediatePage = document.getElementById('intermediatePage');
+    const learningModuleContainer = document.getElementById('learningModuleContainer');
+    const detailsForm = document.getElementById('detailsForm');
+    const testModuleBtn = document.getElementById('testModuleBtn');
+    const learningModuleBtn = document.getElementById('learningModuleBtn');
+    const backToHomeBtn = document.getElementById('backToHomeBtn');
+    const h1 = document.querySelector('h1');
+
+    testModuleBtn.addEventListener('click', () => {
+        intermediatePage.style.display = 'none';
+        detailsForm.style.display = 'block';
+        h1.textContent = 'Test on Investment Products';
+    });
+
+    learningModuleBtn.addEventListener('click', () => {
+        intermediatePage.style.display = 'none';
+        learningModuleContainer.style.display = 'block';
+        h1.textContent = 'Learning Module';
+    });
+
+    backToHomeBtn.addEventListener('click', () => {
+        learningModuleContainer.style.display = 'none';
+        intermediatePage.style.display = 'block';
+        h1.textContent = 'SML Finance Class Room';
+    });
+});
+
 document.getElementById('detailsForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Prevent the default form submission and page refresh
+    e.preventDefault();
 
     const code = document.getElementById('code').value;
 
     try {
-        // Call the backend to check if the employee code already exists
         const response = await fetch('/.netlify/functions/check-submission', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -186,17 +214,14 @@ document.getElementById('detailsForm').addEventListener('submit', async function
         });
 
         if (response.status === 409) {
-            // The code exists; prevent the test from starting and show an alert
             alert("This Employee Code has already submitted the test. You cannot take the test again.");
             return;
         }
 
         if (!response.ok) {
-            // Handle other potential errors from the backend
             throw new Error(`Server error: ${response.status}`);
         }
 
-        // If the code is new (response.ok), proceed to start the test
         document.getElementById('detailsForm').style.display = 'none';
         document.getElementById('testContainer').style.display = 'block';
 
@@ -248,7 +273,6 @@ document.getElementById('nextBtn').addEventListener('click', async function() {
         return;
     }
 
-    // Check if an answer is selected for the current question
     const radios = document.getElementsByName(`question${currentQuestionIndex}`);
     const isAnswered = Array.from(radios).some(radio => radio.checked);
 
@@ -345,14 +369,12 @@ async function submitTest() {
     document.getElementById('downloadCertificateBtn').style.display = 'block';
 
     document.getElementById('downloadCertificateBtn').addEventListener('click', () => {
-        // Get the current date and format it
         const examDate = new Date().toLocaleDateString('en-IN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
         });
 
-        // Use backticks (`) for the multi-line string
         const certificateContent = `
     <style>
         body { font-family: 'Times New Roman', serif; background: #f0f2f5; margin: 0; padding: 20px; }
