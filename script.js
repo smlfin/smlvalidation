@@ -2,7 +2,7 @@
 //  STEP 1: Paste your deployed Apps Script Web App URL below.
 //  (Deploy > New deployment > Web App > Anyone > Deploy > Copy URL)
 // ============================================================
-var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyi8e9vk4ZkqkhK7spkO1MDLlrz58edperXn9BbZCPUebv7RgPWPvcVi-sKx8PQPakN/exec';
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFZJjXT2c8YUQMlOKMqo2dPqxVWoHbHyHmVgiMb-raSDFY2XeuDmbH_kYkWluujm73/exec';
 
 // ── Question bank ─────────────────────────────────────────────
 var questions = [
