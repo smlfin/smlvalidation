@@ -124,6 +124,26 @@ input[type="radio"] {
     margin-right: 10px;
 }
 
+.marks-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+.marks-badge.two-marks {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+}
+.marks-badge.one-mark {
+    background-color: #e8f4fd;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
 #scoreDisplay, #gradeDisplay, #certificateMessage {
     font-size: 20px;
     font-weight: bold;
