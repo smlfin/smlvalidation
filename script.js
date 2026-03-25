@@ -2,7 +2,7 @@
 //  SML Finance Class Room — Frontend Script
 // ============================================================
 var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFZJjXT2c8YUQMlOKMqo2dPqxVWoHbHyHmVgiMb-raSDFY2XeuDmbH_kYkWluujm73/exec';
-
+ 
 // ── Question bank (45 questions, Malayalam, exact as provided) ─
 // marks: 2 for Q1,Q7,Q22,Q28,Q43 — all others: 1
 var questions = [
@@ -492,13 +492,15 @@ var questions = [
 // 2-mark questions: Q1(idx0), Q7(idx6), Q22(idx21), Q28(idx27), Q43(idx42) = 5×2 = 10
 // 1-mark questions: remaining 40 = 40×1 = 40
 // Total = 50 ✓
-
+ 
 // ── State ─────────────────────────────────────────────────────
 var currentIndex      = 0;
 var userAnswers       = {};
 var isSubmitting      = false;
 var shuffledQuestions = [];
-
+var timerInterval     = null;
+var timeRemaining     = 30 * 60; // 45 minutes in seconds
+ 
 // ── Shuffle helper (for options only) ────────────────────────
 function shuffle(arr) {
   for (var i = arr.length - 1; i > 0; i--) {
@@ -507,16 +509,16 @@ function shuffle(arr) {
   }
   return arr;
 }
-
+ 
 // ── Start test on form submit — checks backend first ──────────
 document.getElementById('detailsForm').addEventListener('submit', function(e) {
   e.preventDefault();
-
+ 
   var code = document.getElementById('code').value.trim();
   var btn  = this.querySelector('button[type="submit"]');
   btn.disabled    = true;
   btn.textContent = 'Checking...';
-
+ 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     body:   JSON.stringify({ action: 'check', code: code })
@@ -538,23 +540,23 @@ document.getElementById('detailsForm').addEventListener('submit', function(e) {
     btn.textContent = 'Start Test';
   });
 });
-
+ 
 function startTest() {
   currentIndex = 0;
   userAnswers  = {};
   isSubmitting = false;
-
+ 
   // Build all 45 question blocks (no shuffling of questions, only options)
   var form = document.getElementById('testForm');
   form.innerHTML = '';
-
+ 
   shuffledQuestions = shuffle(questions.slice());
   shuffledQuestions.forEach(function(q, i) {
     var opts = q.opts.slice();
     var marksLabel = q.marks === 2
       ? '<span class="marks-badge two-marks">2 മാർക്ക്</span>'
       : '<span class="marks-badge one-mark">1 മാർക്ക്</span>';
-
+ 
     var div = document.createElement('div');
     div.className = 'question-block';
     div.innerHTML =
@@ -564,22 +566,54 @@ function startTest() {
       }).join('');
     form.appendChild(div);
   });
-
+ 
   var nextBtn = document.getElementById('nextBtn');
   nextBtn.disabled    = false;
   nextBtn.textContent = 'Next';
-
+ 
   document.getElementById('detailsForm').style.display   = 'none';
   document.getElementById('testContainer').style.display = 'block';
   showQuestion(0);
+  startTimer();
 }
-
+ 
+ 
+// ── Timer ─────────────────────────────────────────────────────
+function startTimer() {
+  timeRemaining = 30 * 60;
+  updateTimerDisplay();
+  timerInterval = setInterval(function() {
+    timeRemaining--;
+    updateTimerDisplay();
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      if (!isSubmitting) {
+        isSubmitting = true;
+        saveAnswer(currentIndex);
+        submitTest();
+      }
+    }
+  }, 1000);
+}
+ 
+function updateTimerDisplay() {
+  var mins = Math.floor(timeRemaining / 60);
+  var secs = timeRemaining % 60;
+  var display = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  var el = document.getElementById('timerDisplay');
+  if (el) {
+    el.textContent = '\u23f1 ' + display;
+    el.style.color      = timeRemaining <= 300 ? '#dc3545' : '#004d80';
+    el.style.fontWeight = timeRemaining <= 300 ? 'bold' : '600';
+  }
+}
+ 
 // ── Display one question ──────────────────────────────────────
 function showQuestion(idx) {
   var blocks = document.querySelectorAll('.question-block');
   blocks.forEach(function(b) { b.style.display = 'none'; });
   blocks[idx].style.display = 'block';
-
+ 
   // Restore saved answer
   var saved = userAnswers['q' + idx];
   if (saved) {
@@ -588,7 +622,7 @@ function showQuestion(idx) {
       if (radios[i].value === saved) { radios[i].checked = true; break; }
     }
   }
-
+ 
   document.getElementById('questionCounter').textContent =
     'ചോദ്യം ' + (idx + 1) + ' / ' + questions.length;
   document.getElementById('prevBtn').style.display =
@@ -596,7 +630,7 @@ function showQuestion(idx) {
   document.getElementById('nextBtn').textContent =
     idx === questions.length - 1 ? 'Submit Answers' : 'Next';
 }
-
+ 
 // ── Save current answer ───────────────────────────────────────
 function saveAnswer(idx) {
   var radios = document.getElementsByName('q' + idx);
@@ -604,36 +638,37 @@ function saveAnswer(idx) {
     if (radios[i].checked) { userAnswers['q' + idx] = radios[i].value; return; }
   }
 }
-
+ 
 // ── Next / Submit button ──────────────────────────────────────
 document.getElementById('nextBtn').addEventListener('click', function() {
   if (isSubmitting) return;
-
+ 
   var radios   = document.getElementsByName('q' + currentIndex);
   var answered = false;
   for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { answered = true; break; } }
   if (!answered) { alert('ദയവായി ഒരു ഉത്തരം തിരഞ്ഞെടുക്കുക.'); return; }
-
+ 
   saveAnswer(currentIndex);
-
+ 
   if (currentIndex === questions.length - 1) {
     this.disabled    = true;
     this.textContent = 'Submitting...';
     isSubmitting     = true;
+    clearInterval(timerInterval);
     submitTest();
   } else {
     currentIndex++;
     showQuestion(currentIndex);
   }
 });
-
+ 
 // ── Previous button ───────────────────────────────────────────
 document.getElementById('prevBtn').addEventListener('click', function() {
   saveAnswer(currentIndex);
   currentIndex--;
   showQuestion(currentIndex);
 });
-
+ 
 // ── Calculate score (respects per-question marks) ─────────────
 function calcScore() {
   var score = 0;
@@ -644,15 +679,16 @@ function calcScore() {
   });
   return score;
 }
-
+ 
 // ── Calculate grade ───────────────────────────────────────────
 function getGrade(score) {
   if (score >= 45) return 'Excellent';
   if (score >= 40) return 'Good';
   if (score >= 30) return 'Average';
-  return 'Needs Improvement';
+if (score < 20) return 'Failed';
+  return 'Training Needed';
 }
-
+ 
 // ── Submit test → Apps Script ─────────────────────────────────
 function submitTest() {
   var score       = calcScore();
@@ -661,7 +697,7 @@ function submitTest() {
   var code        = document.getElementById('code').value.trim();
   var designation = document.getElementById('designation').value.trim();
   var branch      = document.getElementById('branch').value.trim();
-
+ 
   var payload = JSON.stringify({
     action:      'submit',
     name:        name,
@@ -671,7 +707,7 @@ function submitTest() {
     score:       score,
     grade:       grade
   });
-
+ 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
     body:   payload
@@ -687,9 +723,94 @@ function submitTest() {
   .catch(function(err) {
     console.error('Network error (result still shown):', err);
   });
-
+ 
   // Show results immediately — never blocked by network
   showResults(score, grade, name, code, designation, branch);
+}
+ 
+// ── Show result screen ────────────────────────────────────────
+function showResults(score, grade, name, code, designation, branch) {
+  document.getElementById('testContainer').style.display    = 'none';
+  document.getElementById('resultsContainer').style.display = 'block';
+  document.getElementById('scoreDisplay').textContent = 'നിങ്ങളുടെ സ്കോർ: ' + score + ' / 50';
+  document.getElementById('gradeDisplay').textContent = 'ഗ്രേഡ്: ' + grade;
+ 
+  // Certificate for ALL scores
+  document.getElementById('certificateMessage').textContent =
+    '🎉 അഭിനന്ദനങ്ങൾ! നിങ്ങൾ പരീക്ഷ പൂർത്തിയാക്കി.';
+  var certBtn = document.getElementById('downloadCertificateBtn');
+  certBtn.style.display = 'inline-block';
+  certBtn.onclick = function() { printCertificate(name, code, designation, branch, score, grade); };
+ 
+  // Download responses
+  var dlBtn = document.getElementById('downloadResponseBtn');
+  dlBtn.style.display = 'inline-block';
+  dlBtn.onclick = function() {
+    var rows = shuffledQuestions.map(function(q, i) {
+      var ans = userAnswers['q' + i] || '';
+      return (i + 1) + '. ' + q.q +
+             '\n   നിങ്ങളുടെ ഉത്തരം : ' + (ans || '(none)') +
+             '\n   ശരിയായ ഉത്തരം   : ' + q.a +
+             '\n   മാർക്ക്            : ' + (ans === q.a ? q.marks + '/' + q.marks : '0/' + q.marks);
+    }).join('\n\n');
+ 
+    var txt = 'SML Finance Class Room — Test Results\n' +
+              '======================================\n' +
+              'Name: ' + name + '  |  Code: ' + code + '\n' +
+              'Designation: ' + designation + '  |  Branch: ' + branch + '\n' +
+              'Score: ' + score + '/50  |  Grade: ' + grade + '\n\n' + rows;
+ 
+    var blob = new Blob([txt], { type: 'text/plain' });
+    var a    = document.createElement('a');
+    a.href   = URL.createObjectURL(blob);
+    a.download = 'response_' + code + '.txt';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+  };
+}
+ 
+// ── Print certificate ─────────────────────────────────────────
+function printCertificate(name, code, designation, branch, score, grade) {
+  var date = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+  var win  = window.open('', '_blank', 'width=950,height=720');
+  win.document.write(
+'<!DOCTYPE html><html><head><title>Certificate</title></head><body>' +
+'<style>' +
+'body{font-family:"Times New Roman",serif;background:#eef2f7;margin:0;padding:30px}' +
+'.cert{width:820px;min-height:560px;margin:auto;background:#fff;border:18px solid #004d80;' +
+'      padding:40px 50px 100px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2);' +
+'      position:relative;box-sizing:border-box}' +
+'.logo{position:absolute;top:22px;left:22px;width:80px}' +
+'h1{font-size:38px;color:#004d80;text-transform:uppercase;letter-spacing:3px;margin-top:30px}' +
+'h2{font-size:16px;color:#555;margin-top:4px;font-weight:normal}' +
+'.line{width:60%;border:none;border-top:1px solid #ccc;margin:18px auto}' +
+'.emp{font-size:28px;font-weight:bold;color:#007bff;margin:14px 0}' +
+'p{font-size:16px;line-height:1.9;margin:6px 0}' +
+'.sigs{display:flex;justify-content:space-around;position:absolute;bottom:30px;left:10%;width:80%}' +
+'.sigs div{text-align:center}' +
+'.sigs span{display:block;border-top:1px solid #333;padding-top:6px;width:130px;font-size:14px}' +
+'</style>' +
+'<div class="cert">' +
+'<img src="v.png" class="logo" alt="Logo">' +
+'<h1>Certificate of Completion</h1>' +
+'<h2>SML Finance Class Room &mdash; Investment Products Training</h2>' +
+'<hr class="line">' +
+'<p>This certifies that</p>' +
+'<p class="emp">' + name + '</p>' +
+'<p>has successfully completed the <strong>Investment Products Training Validation Test</strong>.</p>' +
+'<p><strong>Employee Code:</strong> ' + code +
+'  &bull; <strong>Designation:</strong> ' + designation +
+'  &bull; <strong>Branch:</strong> ' + branch + '</p>' +
+'<p><strong>Score:</strong> ' + score + ' / 50 &bull; <strong>Grade:</strong> ' + grade + '</p>' +
+'<p><strong>Date:</strong> ' + date + '</p>' +
+'<div class="sigs">' +
+'  <div><span>HR Head</span></div>' +
+'  <div><span>Training Head</span></div>' +
+'</div></div>' +
+'</body></html>');
+  win.document.close();
+  win.focus();
+  win.print();
 }
 
 // ── Show result screen ────────────────────────────────────────
