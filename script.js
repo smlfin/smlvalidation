@@ -1,3 +1,8 @@
+// ============================================================
+//  SML Finance Class Room — Frontend Script
+// ============================================================
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFZJjXT2c8YUQMlOKMqo2dPqxVWoHbHyHmVgiMb-raSDFY2XeuDmbH_kYkWluujm73/exec';
+
 // ── Question bank (45 questions, Malayalam, exact as provided) ─
 // marks: 2 for Q1,Q7,Q22,Q28,Q43 — all others: 1
 var questions = [
